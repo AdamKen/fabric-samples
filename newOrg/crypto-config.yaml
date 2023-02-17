@@ -1,0 +1,33 @@
+# ---------------------------------------------------------------------------
+# "OrdererOrgs" - Definition of organizations managing orderer nodes
+# ---------------------------------------------------------------------------
+OrdererOrgs:
+  - Name: OrdererHexiBank
+    Domain: hexibank
+    CA:
+      Country: CN
+      Province: Hexi
+      Locality: Jixi
+      StreetAddress: Jiefang
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: orderer0
+      - Hostname: orderer1
+# ---------------------------------------------------------------------------
+# "PeerOrgs" - Definition of organizations managing peer nodes
+# ---------------------------------------------------------------------------
+PeerOrgs:
+  - Name: HexiBank
+    Domain: hexibank
+    CA:
+      Country: CN
+      Province: Hexi
+      Locality: Jixi
+      StreetAddress: Jiefang
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 1
+
+

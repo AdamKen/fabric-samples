@@ -1,0 +1,32 @@
+Organizations:
+    - &OrdererHexiBank
+        Name: OrdererHexiBankMSP
+        ID: OrdererHexiBankMSP
+        MSPDir: crypto-config/ordererOrganizations/hexibank/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererHexiBankMSP.member', 'OrdererShandongBankMSP.member', 'OrdererBeijingBankMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererHexiBankMSP.member', 'OrdererHexiBankMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererHexiBankMSP.admin')"
+    - &HexiBank
+        Name: HexiBankMSP
+        ID: HexiBankMSP
+        MSPDir: crypto-config/peerOrganizations/hexibank/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('HexiBankMSP.admin', 'HexiBankMSP.peer', 'HexiBankMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('HexiBankMSP.admin', 'HexiBankMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('HexiBankMSP.admin')"
+        AnchorPeers:
+            - Host: peer0.hexibank
+              Port: 9060
