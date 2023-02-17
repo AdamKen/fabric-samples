@@ -1,0 +1,60 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# ---------------------------------------------------------------------------
+# "OrdererOrgs" - Definition of organizations managing orderer nodes
+# ---------------------------------------------------------------------------
+OrdererOrgs:
+  - Name: OrdererShandongBank
+    Domain: shandongbank
+    CA:
+      Country: CN
+      Province: Shandong
+      Locality: Jinan
+      StreetAddress: Huaneng
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: orderer0
+      - Hostname: orderer1
+  - Name: OrdererBeijingBank
+    Domain: beijingbank
+    CA:
+      Country: CN
+      Province: Peking
+      Locality: Xicheng
+      StreetAddress: Jinrong
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: orderer0
+      - Hostname: orderer1
+# ---------------------------------------------------------------------------
+# "PeerOrgs" - Definition of organizations managing peer nodes
+# ---------------------------------------------------------------------------
+PeerOrgs:
+  - Name: ShandongBank
+    Domain: shandongbank
+    CA:
+      Country: CN
+      Province: Shandong
+      Locality: Jinan
+      StreetAddress: Huaneng
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 1
+  - Name: BeijingBank
+    Domain: beijingbank
+    CA:
+      Country: CN
+      Province: Peking
+      Locality: Xicheng
+      StreetAddress: Jinrong
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 1
+

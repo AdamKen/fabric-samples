@@ -1,0 +1,266 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+services:
+
+  orderer0.shandongbank:
+    container_name: orderer0.shandongbank
+    extends:
+      file: peer-base.yaml
+      service: orderer-base
+    environment:
+      - ORDERER_GENERAL_LISTENPORT=7080
+      - ORDERER_GENERAL_LOCALMSPID=OrdererShandongBankMSP
+    volumes:
+        - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+        - ../crypto-config/ordererOrganizations/shandongbank/orderers/orderer0.shandongbank/msp:/var/hyperledger/orderer/msp
+        - ../crypto-config/ordererOrganizations/shandongbank/orderers/orderer0.shandongbank/tls/:/var/hyperledger/orderer/tls
+    ports:
+      - 7080:7080
+
+  orderer1.shandongbank:
+    container_name: orderer1.shandongbank
+    extends:
+      file: peer-base.yaml
+      service: orderer-base
+    environment:
+      - ORDERER_GENERAL_LISTENPORT=7090
+      - ORDERER_GENERAL_LOCALMSPID=OrdererShandongBankMSP
+    volumes:
+        - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+        - ../crypto-config/ordererOrganizations/shandongbank/orderers/orderer1.shandongbank/msp:/var/hyperledger/orderer/msp
+        - ../crypto-config/ordererOrganizations/shandongbank/orderers/orderer1.shandongbank/tls/:/var/hyperledger/orderer/tls
+    ports:
+      - 7090:7090
+
+  peer0.shandongbank:
+    container_name: peer0.shandongbank
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.shandongbank
+      - CORE_PEER_ADDRESS=peer0.shandongbank:7060
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7060
+      - CORE_PEER_CHAINCODEADDRESS=peer0.shandongbank:7061
+      # - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
+      # - CORE_CHAINCODE_LOGGING_SHIM=DEBUG
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7061
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.shandongbank:7070
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.shandongbank:7060
+      - CORE_PEER_LOCALMSPID=ShandongBankMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/shandongbank/peers/peer0.shandongbank/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/shandongbank/peers/peer0.shandongbank/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 7060:7060
+      - 7061:7061
+  peer1.shandongbank:
+    container_name: peer1.shandongbank
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.shandongbank
+      - CORE_PEER_ADDRESS=peer1.shandongbank:7070
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7070
+      - CORE_PEER_CHAINCODEADDRESS=peer1.shandongbank:7071
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7071
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.shandongbank:7070
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.shandongbank:7060
+      - CORE_PEER_LOCALMSPID=ShandongBankMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/shandongbank/peers/peer1.shandongbank/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/shandongbank/peers/peer1.shandongbank/tls:/etc/hyperledger/fabric/tls    
+    ports:
+      - 7070:7070
+      - 7071:7071
+    
+  orderer0.beijingbank:
+    container_name: orderer0.beijingbank
+    extends:
+      file: peer-base.yaml
+      service: orderer-base
+    environment:
+      - ORDERER_GENERAL_LISTENPORT=8080
+      - ORDERER_GENERAL_LOCALMSPID=OrdererBeijingBankMSP
+    volumes:
+        - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+        - ../crypto-config/ordererOrganizations/beijingbank/orderers/orderer0.beijingbank/msp:/var/hyperledger/orderer/msp
+        - ../crypto-config/ordererOrganizations/beijingbank/orderers/orderer0.beijingbank/tls/:/var/hyperledger/orderer/tls
+    ports:
+      - 8080:8080
+      
+  orderer1.beijingbank:
+    container_name: orderer1.beijingbank
+    extends:
+      file: peer-base.yaml
+      service: orderer-base
+    environment:
+      - ORDERER_GENERAL_LISTENPORT=8090
+      - ORDERER_GENERAL_LOCALMSPID=OrdererBeijingBankMSP
+    volumes:
+        - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+        - ../crypto-config/ordererOrganizations/beijingbank/orderers/orderer1.beijingbank/msp:/var/hyperledger/orderer/msp
+        - ../crypto-config/ordererOrganizations/beijingbank/orderers/orderer1.beijingbank/tls/:/var/hyperledger/orderer/tls
+    ports:
+      - 8090:8090
+
+  peer0.beijingbank:
+    container_name: peer0.beijingbank
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.beijingbank
+      - CORE_PEER_ADDRESS=peer0.beijingbank:8060
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8060
+      - CORE_PEER_CHAINCODEADDRESS=peer0.beijingbank:8061
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8061
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.beijingbank:8070
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.beijingbank:8060
+      - CORE_PEER_LOCALMSPID=BeijingBankMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/beijingbank/peers/peer0.beijingbank/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/beijingbank/peers/peer0.beijingbank/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 8060:8060
+
+  peer1.beijingbank:
+    container_name: peer1.beijingbank
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.beijingbank
+      - CORE_PEER_ADDRESS=peer1.beijingbank:8070
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8070
+      - CORE_PEER_CHAINCODEADDRESS=peer1.beijingbank:8071
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8071
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.beijingbank:8070
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.beijingbank:8060
+      - CORE_PEER_LOCALMSPID=BeijingBankMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/beijingbank/peers/peer1.beijingbank/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/beijingbank/peers/peer1.beijingbank/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 8070:8070
+
+  
+  cli-sdb-peer0:
+    container_name: cli-sdb-peer0
+    image: hyperledger/fabric-tools:1.4.6
+    tty: true
+    stdin_open: true
+    environment:
+      - SYS_CHANNEL=sys-channel
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.shandongbank:7060
+      - CORE_PEER_LOCALMSPID=ShandongBankMSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shandongbank/peers/peer0.shandongbank/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shandongbank/peers/peer0.shandongbank/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shandongbank/peers/peer0.shandongbank/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shandongbank/users/Admin@shandongbank/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../chaincode/:/opt/gopath/src/github.com/chaincode
+        - ../crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ../scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+        - ../channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+  cli-sdb-peer1:
+    container_name: cli-sdb-peer1
+    image: hyperledger/fabric-tools:1.4.6
+    tty: true
+    stdin_open: true
+    environment:
+      - SYS_CHANNEL=sys-channel
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer1.shandongbank:7070
+      - CORE_PEER_LOCALMSPID=ShandongBankMSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shandongbank/peers/peer1.shandongbank/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shandongbank/peers/peer1.shandongbank/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shandongbank/peers/peer1.shandongbank/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/shandongbank/users/Admin@shandongbank/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../chaincode/:/opt/gopath/src/github.com/chaincode
+        - ../crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ../scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+        - ../channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+
+  cli-bjb-peer0:
+    container_name: cli-bjb-peer0
+    image: hyperledger/fabric-tools:1.4.6
+    tty: true
+    stdin_open: true
+    environment:
+      - SYS_CHANNEL=sys-channel
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.beijingbank:8060
+      - CORE_PEER_LOCALMSPID=BeijingBankMSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/beijingbank/peers/peer0.beijingbank/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/beijingbank/peers/peer0.beijingbank/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/beijingbank/peers/peer0.beijingbank/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/beijingbank/users/Admin@beijingbank/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../chaincode/:/opt/gopath/src/github.com/chaincode
+        - ../crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ../scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+        - ../channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+  cli-bjb-peer1:
+    container_name: cli-bjb-peer1
+    image: hyperledger/fabric-tools:1.4.6
+    tty: true
+    stdin_open: true
+    environment:
+      - SYS_CHANNEL=sys-channel
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer1.beijingbank:8070
+      - CORE_PEER_LOCALMSPID=BeijingBankMSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/beijingbank/peers/peer1.beijingbank/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/beijingbank/peers/peer1.beijingbank/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/beijingbank/peers/peer1.beijingbank/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/beijingbank/users/Admin@beijingbank/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../chaincode/:/opt/gopath/src/github.com/chaincode
+        - ../crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ../scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+        - ../channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
