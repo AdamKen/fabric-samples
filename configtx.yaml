@@ -358,20 +358,6 @@ Channel: &ChannelDefaults
 #
 ################################################################################
 Profiles:
-    TwoOrgsOrdererGenesis:
-        <<: *ChannelDefaults
-        Orderer:
-            <<: *OrdererDefaults
-            Organizations:
-                - *OrdererShandongBank
-                - *OrdererBeijingBank
-            Capabilities:
-                <<: *OrdererCapabilities
-        Consortiums:
-            SampleConsortium:
-                Organizations:
-                    - *BeijingBank
-                    - *ShandongBank
     TwoOrgsChannel:
         Consortium: SampleConsortium
         <<: *ChannelDefaults
