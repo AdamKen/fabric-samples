@@ -264,7 +264,7 @@ docker exec -it cli-sdb-peer1 peer chaincode install -n tcc1 -v 1.0 -l golang -p
 docker exec -it cli-bjb-peer0 peer chaincode install -n tcc1 -v 1.0 -l golang -p github.com/chaincode/tcc
 docker exec -it cli-bjb-peer1 peer chaincode install -n tcc1 -v 1.0 -l golang -p github.com/chaincode/tcc
 #instantiate chaincode
-docker exec -it cli-sdb-peer0 -- pwd
+docker exec -it cli-sdb-peer0 bash
 peer chaincode instantiate -o orderer0.shandongbank:7080 --tls --cafile $(pwd)/crypto/ordererOrganizations/shandongbank/orderers/orderer0.shandongbank/msp/tlscacerts/tlsca.shandongbank-cert.pem -C testchannel -n tcc1 -v 1.0 -c '{"Args":["init","a", "100", "b","200"]}' -P "AND ('ShandongBankMSP.peer','BeijingBankMSP.peer')"
 exit
 
