@@ -1,0 +1,142 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+services:
+
+  orderer0.hexibank:
+    container_name: orderer0.hexibank
+    extends:
+      file: peer-base.yaml
+      service: orderer-base
+    environment:
+      - ORDERER_GENERAL_LISTENPORT=9080
+      - ORDERER_GENERAL_LOCALMSPID=OrdererHexiMSP
+    volumes:
+        - ../../data/orderer0.hexibank:/var/hyperledger/production
+        - ../../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+        - ../../crypto-config/ordererOrganizations/hexibank/orderers/orderer0.hexibank/msp:/var/hyperledger/orderer/msp
+        - ../../crypto-config/ordererOrganizations/hexibank/orderers/orderer0.hexibank/tls/:/var/hyperledger/orderer/tls
+    ports:
+      - 9080:9080
+
+  orderer1.hexibank:
+    container_name: orderer1.hexibank
+    extends:
+      file: peer-base.yaml
+      service: orderer-base
+    environment:
+      - ORDERER_GENERAL_LISTENPORT=9090
+      - ORDERER_GENERAL_LOCALMSPID=OrdererHexiBankMSP
+    volumes:
+        - ../../data/orderer1.hexibank:/var/hyperledger/production
+        - ../../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+        - ../../crypto-config/ordererOrganizations/hexibank/orderers/orderer1.hexibank/msp:/var/hyperledger/orderer/msp
+        - ../../crypto-config/ordererOrganizations/hexibank/orderers/orderer1.hexibank/tls/:/var/hyperledger/orderer/tls
+    ports:
+      - 9090:9090
+
+  peer0.hexibank:
+    container_name: peer0.hexibank
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.hexibank
+      - CORE_PEER_ADDRESS=peer0.hexibank:9060
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:9060
+      - CORE_PEER_CHAINCODEADDRESS=peer0.hexibank:9061
+      # - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
+      # - CORE_CHAINCODE_LOGGING_SHIM=DEBUG
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9061
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.hexibank:9070
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.hexibank:9060
+      - CORE_PEER_LOCALMSPID=HexiBankMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../../data/peer0.hexibank:/var/hyperledger/production
+        - ../../crypto-config/peerOrganizations/hexibank/peers/peer0.hexibank/msp:/etc/hyperledger/fabric/msp
+        - ../../crypto-config/peerOrganizations/hexibank/peers/peer0.hexibank/tls:/etc/hyperledger/fabric/tls
+    ports:
+      - 9060:9060
+      - 9061:9061
+  peer1.hexibank:
+    container_name: peer1.hexibank
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.hexibank
+      - CORE_PEER_ADDRESS=peer1.hexibank:9070
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:9070
+      - CORE_PEER_CHAINCODEADDRESS=peer1.hexibank:9071
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9071
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.hexibank:9070
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.hexibank:9060
+      - CORE_PEER_LOCALMSPID=HexiBankMSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../../data/peer1.hexibank:/var/hyperledger/production
+        - ../../crypto-config/peerOrganizations/hexibank/peers/peer1.hexibank/msp:/etc/hyperledger/fabric/msp
+        - ../../crypto-config/peerOrganizations/hexibank/peers/peer1.hexibank/tls:/etc/hyperledger/fabric/tls    
+    ports:
+      - 9070:9070
+      - 9071:9071
+    
+  cli-hxb-peer0:
+    container_name: cli-hxb-peer0
+    image: hyperledger/fabric-tools:1.4.6
+    tty: true
+    stdin_open: true
+    environment:
+      - SYS_CHANNEL=sys-channel
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.hexibank:9060
+      - CORE_PEER_LOCALMSPID=HexiBankMSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/hexibank/peers/peer0.hexibank/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/hexibank/peers/peer0.hexibank/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/hexibank/peers/peer0.hexibank/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/hexibank/users/Admin@hexibank/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../../chaincode/:/opt/gopath/src/github.com/chaincode
+        - ../../crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ../../scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+        - ../../channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+  cli-hxb-peer1:
+    container_name: cli-hxb-peer1
+    image: hyperledger/fabric-tools:1.4.6
+    tty: true
+    stdin_open: true
+    environment:
+      - SYS_CHANNEL=sys-channel
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - FABRIC_LOGGING_SPEC=INFO
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer1.hexibank:9070
+      - CORE_PEER_LOCALMSPID=HexiBankMSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/hexibank/peers/peer1.hexibank/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/hexibank/peers/peer1.hexibank/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/hexibank/peers/peer1.hexibank/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/hexibank/users/Admin@hexibank/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../../chaincode/:/opt/gopath/src/github.com/chaincode
+        - ../../crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ../../scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+        - ../../channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts

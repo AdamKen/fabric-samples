@@ -16,6 +16,7 @@ services:
       - ORDERER_GENERAL_LISTENPORT=7080
       - ORDERER_GENERAL_LOCALMSPID=OrdererShandongBankMSP
     volumes:
+        - ../data/orderer0.shandongbank:/var/hyperledger/production
         - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
         - ../crypto-config/ordererOrganizations/shandongbank/orderers/orderer0.shandongbank/msp:/var/hyperledger/orderer/msp
         - ../crypto-config/ordererOrganizations/shandongbank/orderers/orderer0.shandongbank/tls/:/var/hyperledger/orderer/tls
@@ -31,6 +32,7 @@ services:
       - ORDERER_GENERAL_LISTENPORT=7090
       - ORDERER_GENERAL_LOCALMSPID=OrdererShandongBankMSP
     volumes:
+        - ../data/orderer1.shandongbank:/var/hyperledger/production
         - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
         - ../crypto-config/ordererOrganizations/shandongbank/orderers/orderer1.shandongbank/msp:/var/hyperledger/orderer/msp
         - ../crypto-config/ordererOrganizations/shandongbank/orderers/orderer1.shandongbank/tls/:/var/hyperledger/orderer/tls
@@ -55,6 +57,7 @@ services:
       - CORE_PEER_LOCALMSPID=ShandongBankMSP
     volumes:
         - /var/run/:/host/var/run/
+        - ../data/peer0.shandongbank:/var/hyperledger/production
         - ../crypto-config/peerOrganizations/shandongbank/peers/peer0.shandongbank/msp:/etc/hyperledger/fabric/msp
         - ../crypto-config/peerOrganizations/shandongbank/peers/peer0.shandongbank/tls:/etc/hyperledger/fabric/tls
     ports:
@@ -76,6 +79,7 @@ services:
       - CORE_PEER_LOCALMSPID=ShandongBankMSP
     volumes:
         - /var/run/:/host/var/run/
+        - ../data/peer1.shandongbank:/var/hyperledger/production
         - ../crypto-config/peerOrganizations/shandongbank/peers/peer1.shandongbank/msp:/etc/hyperledger/fabric/msp
         - ../crypto-config/peerOrganizations/shandongbank/peers/peer1.shandongbank/tls:/etc/hyperledger/fabric/tls    
     ports:
@@ -91,6 +95,7 @@ services:
       - ORDERER_GENERAL_LISTENPORT=8080
       - ORDERER_GENERAL_LOCALMSPID=OrdererBeijingBankMSP
     volumes:
+        - ../data/orderer0.beijingbank:/var/hyperledger/production
         - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
         - ../crypto-config/ordererOrganizations/beijingbank/orderers/orderer0.beijingbank/msp:/var/hyperledger/orderer/msp
         - ../crypto-config/ordererOrganizations/beijingbank/orderers/orderer0.beijingbank/tls/:/var/hyperledger/orderer/tls
@@ -106,6 +111,7 @@ services:
       - ORDERER_GENERAL_LISTENPORT=8090
       - ORDERER_GENERAL_LOCALMSPID=OrdererBeijingBankMSP
     volumes:
+        - ../data/orderer1.beijingbank:/var/hyperledger/production
         - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
         - ../crypto-config/ordererOrganizations/beijingbank/orderers/orderer1.beijingbank/msp:/var/hyperledger/orderer/msp
         - ../crypto-config/ordererOrganizations/beijingbank/orderers/orderer1.beijingbank/tls/:/var/hyperledger/orderer/tls
@@ -128,6 +134,7 @@ services:
       - CORE_PEER_LOCALMSPID=BeijingBankMSP
     volumes:
         - /var/run/:/host/var/run/
+        - ../data/peer0.beijingbank:/var/hyperledger/production
         - ../crypto-config/peerOrganizations/beijingbank/peers/peer0.beijingbank/msp:/etc/hyperledger/fabric/msp
         - ../crypto-config/peerOrganizations/beijingbank/peers/peer0.beijingbank/tls:/etc/hyperledger/fabric/tls
     ports:
@@ -149,6 +156,7 @@ services:
       - CORE_PEER_LOCALMSPID=BeijingBankMSP
     volumes:
         - /var/run/:/host/var/run/
+        - ../data/peer1.beijingbank:/var/hyperledger/production
         - ../crypto-config/peerOrganizations/beijingbank/peers/peer1.beijingbank/msp:/etc/hyperledger/fabric/msp
         - ../crypto-config/peerOrganizations/beijingbank/peers/peer1.beijingbank/tls:/etc/hyperledger/fabric/tls
     ports:

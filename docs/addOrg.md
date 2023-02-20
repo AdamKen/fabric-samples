@@ -43,7 +43,6 @@ PeerOrgs:
 cd newOrg
 ../bin/cryptogen generate --config=crypto-config.yaml
 ```
-注意，虽然这里一次性生成了所有需要的节点证书，但是下面的过程要分开操作。
 #### 编写组织配置文件
 新组织管理员需要和联盟内组织管理员协商制定组织规则，保存到configtx.yaml。但是内容更简短：
 ```yaml
@@ -89,6 +88,8 @@ Organizations:
 然后联盟内管理员拉取最新配置区块到本地：
 ```shell
 docker exec -it cli-sdb-peer0
+export CORE_PEER_LOCALMSPID=OrdererShandongBankMSP
+export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/shandongbank/users/Admin@shandongbank/msp/
 #此处没有指定区块序号，而是用config自动获取最新配置区块
 #-c使用的通道名称是系统通道的名字sys-channel，这是联盟链创建时指定的。
 peer channel fetch config ./channel-artifacts/config.block -o orderer0.shandongbank:7080 -c sys-channel --tls --cafile $(pwd)/crypto/ordererOrganizations/shandongbank/orderers/orderer0.shandongbank/msp/tlscacerts/tlsca.shandongbank-cert.pem
@@ -98,8 +99,10 @@ exit
 ```shell
 ../bin/configtxlator proto_decode --input config.block --type common.Block | jq .data.data[0].payload.data.config > config.json
 ```
-现在可以将之前生成的ordererhexibank.json添加到config.json中了。在config.json>channel_group>groups>Orderer>groups中可以看到联盟内已有的两个orderer组织OrdererBeijingBank和OrdererShandongBank，管理员要做的就是添加一条键为OrdererHexiBank，值为ordererhexibank.json中内容的记录。这样就把Orderer组织加入到了配置。  
-同时，可以把一个orderer节点添加到配置中：config.json>channel_group>groups>Orderer>values>ConsensusType>value>metadata>consenters中定义了共识节点，也就是orderer，管理员可以参照已经存在的节点记录添加新节点的记录，其中的client_tls_cert和server_tls_cert一般是节点证书路径下的tls/server.crt的base64编码。最后在config.json>channel_group>values>OrdererAddresses>value>addresses添加相应的orderer节点记录。  
+现在可以将之前生成的ordererhexibank.json添加到config.json中了。  
+- config.json > channel_group > groups> Orderer> groups和config.json > channel_group > groups > Application > groups 中可以看到联盟内已有的两个 orderer组织 OrdererBeijingBank和 OrdererShandongBank，管理员要做的就是添加一条键为 OrdererHexiBank，值为 ordererhexibank.json中内容的记录。这样就把Orderer组织加入到了配置。    
+- config.json>channel_group>groups>Orderer>values>ConsensusType>value>metadata>consenters中定义了共识节点，也就是orderer，管理员可以参照已经存在的节点记录添加新节点的记录，其中的client_tls_cert和server_tls_cert一般是节点证书路径下的tls/server.crt的base64编码。  
+- config.json>channel_group>values>OrdererAddresses>value>addresses添加相应的orderer节点记录。  
 再次强调下，管理员可能想相同时添加两个orderer节点，但是这会导致配置更新失败，因为etcd-raft决定了一次只能添加一个节点。  
 编辑完成后，将文件另存为m_config.json, 区别于原来的config.json。 然后将这两个json转回protobuf 格式：
 ```shell
@@ -114,7 +117,7 @@ exit
 ```shell
 ../bin/configtxlator proto_decode --input ordererhexibank_update.pb --type common.ConfigUpdate > ordererhexibank_update.json
 #添加交易头
-echo '{"payload":{"header":{"channel_header":{"channel_id":"sys-channel", "type":2}},"data":{"config_update":'$(cat ordererhexibank_update.json)'}}}' | jq . > config/system/ordererhexibank_update_envelope.json
+echo '{"payload":{"header":{"channel_header":{"channel_id":"sys-channel", "type":2}},"data":{"config_update":'$(cat ordererhexibank_update.json)'}}}' | jq . > ordererhexibank_update_envelope.json
 ```
 将交易json转为protobuf格式：
 ```shell
@@ -122,14 +125,14 @@ echo '{"payload":{"header":{"channel_header":{"channel_id":"sys-channel", "type"
 ```
 最后由联盟内双方管理员签名并更新配置到联盟链。由于更新操作实际上包含了签名动作，所以实际上是一方执行签名操作，然后另一方执行更新操作。
 ```shell
-docker exec -it cli-sdb-peer0
+docker exec -it cli-sdb-peer0 bash
 #使用OrdererShandongbankMSP 的管理员身份执行签名操作
 export CORE_PEER_LOCALMSPID=OrdererShandongBankMSP
 export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/shandongbank/users/Admin@shandongbank/msp/
 peer channel signconfigtx -f channel-artifacts/ordererhexibank_update_envelope.pb
 exit
 
-docker exec -it cli-bjb-peer0
+docker exec -it cli-bjb-peer0 bash 
 #使用OrdererBeijingBankMSP 的管理员身份执行更新操作
 export CORE_PEER_LOCALMSPID=OrdererBeijingBankMSP
 export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/beijingbank/users/Admin@beijingbank/msp/
