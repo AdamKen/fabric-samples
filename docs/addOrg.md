@@ -87,7 +87,7 @@ Organizations:
 ```
 然后联盟内管理员拉取最新配置区块到本地：
 ```shell
-docker exec -it cli-sdb-peer0
+docker exec -it cli-sdb-peer0 bash
 export CORE_PEER_LOCALMSPID=OrdererShandongBankMSP
 export CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/shandongbank/users/Admin@shandongbank/msp/
 #此处没有指定区块序号，而是用config自动获取最新配置区块

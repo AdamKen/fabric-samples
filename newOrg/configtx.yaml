@@ -6,10 +6,10 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('OrdererHexiBankMSP.member','OrdererBeijingBankMSP.member','OrdererShandongBankMSP.member')"
+                Rule: "OR('OrdererHexiBankMSP.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('OrdererHexiBankMSP.member', 'OrdererHexiBankMSP.member')"
+                Rule: "OR('OrdererHexiBankMSP.member')"
             Admins:
                 Type: Signature
                 Rule: "OR('OrdererHexiBankMSP.admin')"

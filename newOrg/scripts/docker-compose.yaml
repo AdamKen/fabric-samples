@@ -14,7 +14,7 @@ services:
       service: orderer-base
     environment:
       - ORDERER_GENERAL_LISTENPORT=9080
-      - ORDERER_GENERAL_LOCALMSPID=OrdererHexiMSP
+      - ORDERER_GENERAL_LOCALMSPID=OrdererHexiBankMSP
     volumes:
         - ../../data/orderer0.hexibank:/var/hyperledger/production
         - ../../channel-artifacts/config.block:/var/hyperledger/orderer/orderer.genesis.block
