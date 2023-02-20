@@ -238,23 +238,18 @@ docker compose -f docker-compose.yaml down --volumes --remove-orphans
 docker exec -it cli-sdb-peer0 bash
 peer channel create -o orderer0.shandongbank:7080  -c testchannel -f $(pwd)/channel-artifacts/channel.tx --tls --cafile $(pwd)/crypto/ordererOrganizations/shandongbank/orderers/orderer0.shandongbank/msp/tlscacerts/tlsca.shandongbank-cert.pem
 peer channel join -b testchannel.block
+cp testchannel.block channel-artifacts/
 peer channel update -o orderer0.shandongbank:7080 -c testchannel -f ./channel-artifacts/ShandongBankMSPanchors.tx --tls --cafile $(pwd)/crypto/ordererOrganizations/shandongbank/orderers/orderer0.shandongbank/msp/tlscacerts/tlsca.shandongbank-cert.pem
 exit
 
-docker exec -it cli-sdb-peer1 bash
-peer channel fetch 0 testchannel.block -o orderer0.shandongbank:7080 -c testchannel --tls --cafile $(pwd)/crypto/ordererOrganizations/shandongbank/orderers/orderer0.shandongbank/msp/tlscacerts/tlsca.shandongbank-cert.pem
-peer channel join -b testchannel.block
-exit
+docker exec -it cli-sdb-peer1 peer channel join -b channel-artifacts/testchannel.block
+docker exec -it cli-bjb-peer0 peer channel join -b channel-artifacts/testchannel.block
+docker exec -it cli-bjb-peer1 peer channel join -b channel-artifacts/testchannel.block
 
 docker exec -it cli-bjb-peer0 bash
-peer channel fetch 0 testchannel.block -o orderer0.beijingbank:8080 -c testchannel --tls --cafile $(pwd)/crypto/ordererOrganizations/beijingbank/orderers/orderer0.beijingbank/msp/tlscacerts/tlsca.beijingbank-cert.pem
-peer channel join -b testchannel.block
+# peer channel fetch 0 testchannel.block -o orderer0.beijingbank:8080 -c testchannel --tls --cafile $(pwd)/crypto/ordererOrganizations/beijingbank/orderers/orderer0.beijingbank/msp/tlscacerts/tlsca.beijingbank-cert.pem
+# peer channel join -b testchannel.block
 peer channel update -o orderer0.beijingbank:8080 -c testchannel -f ./channel-artifacts/BeijingBankMSPanchors.tx --tls --cafile $(pwd)/crypto/ordererOrganizations/beijingbank/orderers/orderer0.beijingbank/msp/tlscacerts/tlsca.beijingbank-cert.pem
-exit
-
-docker exec -it cli-bjb-peer1 bash
-peer channel fetch 0 testchannel.block -o orderer0.beijingbank:8080 -c testchannel --tls --cafile $(pwd)/crypto/ordererOrganizations/beijingbank/orderers/orderer0.beijingbank/msp/tlscacerts/tlsca.beijingbank-cert.pem
-peer channel join -b testchannel.block
 exit
 
 
