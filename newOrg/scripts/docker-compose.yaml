@@ -17,7 +17,7 @@ services:
       - ORDERER_GENERAL_LOCALMSPID=OrdererHexiMSP
     volumes:
         - ../../data/orderer0.hexibank:/var/hyperledger/production
-        - ../../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+        - ../../channel-artifacts/config.block:/var/hyperledger/orderer/orderer.genesis.block
         - ../../crypto-config/ordererOrganizations/hexibank/orderers/orderer0.hexibank/msp:/var/hyperledger/orderer/msp
         - ../../crypto-config/ordererOrganizations/hexibank/orderers/orderer0.hexibank/tls/:/var/hyperledger/orderer/tls
     ports:
@@ -33,7 +33,7 @@ services:
       - ORDERER_GENERAL_LOCALMSPID=OrdererHexiBankMSP
     volumes:
         - ../../data/orderer1.hexibank:/var/hyperledger/production
-        - ../../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+        - ../../channel-artifacts/config.block:/var/hyperledger/orderer/orderer.genesis.block
         - ../../crypto-config/ordererOrganizations/hexibank/orderers/orderer1.hexibank/msp:/var/hyperledger/orderer/msp
         - ../../crypto-config/ordererOrganizations/hexibank/orderers/orderer1.hexibank/tls/:/var/hyperledger/orderer/tls
     ports:
