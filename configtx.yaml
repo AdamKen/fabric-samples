@@ -33,7 +33,7 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('OrdererShandongBankMSP.member')"
+                Rule: "OR('OrdererShandongBankMSP.member','OrdererBeijingBankMSP.member')"
             Writers:
                 Type: Signature
                 Rule: "OR('OrdererShandongBankMSP.member')"
@@ -58,7 +58,7 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('OrdererBeijingBankMSP.member')"
+                Rule: "OR('OrdererBeijingBankMSP.member','OrdererShandongBankMSP.member')"
             Writers:
                 Type: Signature
                 Rule: "OR('OrdererBeijingBankMSP.member')"
