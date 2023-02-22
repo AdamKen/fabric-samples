@@ -1,12 +1,12 @@
 ## 添加组织
 在之前的场景中，山东银行和北京银行组建了一条联盟链并投入使用。现在有一家新的银行——河西银行慕名而来，准备加入这个跨行结算联盟链。  
-按照平等共治的原则，河西银行希望和之前的银行一样引入两个组织四个节点：
+按照平等共治的原则，河西银行希望和之前的银行一样引入两个组织四个节点，并且加入正在运行的通道testchannel：
 | 组织类型 | 组织名称            |  节点数量  |
 | ------  | ------------------  | ----------|
 | 排序    | OrdererHexiBank    | 2         |     
 | 背书    | HexiBank           | 2         |
 
-很遗憾的是，排序组织和背书组织的新增过程并不一样。原因在于排序节点的更改在系统通道层级，而背书节点的更改一般只涉及应用通道。另一个区别是，排序节点只允许逐个添加，而背书节点没有这个限制。
+很遗憾的是，排序组织和背书组织的新增过程并不一样,所以下面要分开讨论。原因在于排序节点的更改在系统通道层级，而背书节点的更改一般只涉及应用通道。另一个区别是，排序节点只允许逐个添加，而背书节点没有这个限制。
 ### 添加OrdererMSP
 要添加排序组织，必须更新系统通道和现有的应用通道。因为新建业务通道时，会拉取系统通道的配置，其中就包括排序组织的信息。
 下面以更新系统通道为例，说明如何向通道添加排序组织（和节点）。注意，因为ETCD-RAFT的限制，一次更改只能添加一个节点。
@@ -142,3 +142,58 @@ exit
 ```
 至此，已经成功向系统通道添加了一个排序组织OrdererHexiBankMSP，以及一个节点。启动这个节点，等待一段时间，即可看到这个节点被纳入到raft集群中。  
 下一步管理员需要将另一个orderer节点添加到系统通道。完成后，即完成了系统通道的更新，但是要想将这个组织纳入到正在运行的业务通道，管理员需要按上面的步骤再更新一次业务通道，唯一的区别是把系统通道的名称（这里是sys-channel）更改为待更新的业务通道名称（如本例中的testchannel）。
+
+### 添加背书组织与节点
+添加背书组织的整体流程与排序节点非常类似，差别是，这个过程中联盟管理员只需添加背书组织，完成后新组织的管理员可以自行启动并申请加入通道。  
+首先，生成新组织HexiBank的配置信息：
+```shell
+../bin/configtxgen -printOrg HexiBankMSP > ../channel-artifacts/hexibank.json
+```
+然后拉取应用通道的配置区块：  
+```shell
+docker exec -it cli-sdb-peer0 bash
+#此处没有指定区块序号，而是用config自动获取最新配置区块
+#-c使用的是应用通道的名字testchannel。
+peer channel fetch config ./channel-artifacts/config.block -o orderer0.shandongbank:7080 -c testchannel --tls --cafile $(pwd)/crypto/ordererOrganizations/shandongbank/orderers/orderer0.shandongbank/msp/tlscacerts/tlsca.shandongbank-cert.pem
+exit 
+```
+将配置区块转为json格式：
+```shell
+cd channel-artifacts
+../bin/configtxlator proto_decode --input config.block --type common.Block | jq .data.data[0].payload.data.config > config.json
+```
+将新组织的配置信息新增到json中，路径为config.json>channel_group>groups>Application>groups。
+```shell
+#使用jq简化编辑过程
+jq -s '.[0] * {"channel_group":{"groups":{"Application":{"groups": {"HexiBankMSP":.[1]}}}}}' config.json hexibank.json > m_config.json
+```
+下面将两个json转回protobuf格式：
+```shell
+../bin/configtxlator proto_encode --input config.json --type common.Config --output config.pb
+../bin/configtxlator proto_encode --input m_config.json --type common.Config --output m_config.pb
+```
+然后计算差异得到更新配置：
+```
+../bin/configtxlator compute_update --channel_id testchannel --original config.pb --updated m_config.pb --output hexibank_update.pb
+```
+向更新配置中添加交易头信息：
+```shell
+../bin/configtxlator proto_decode --input ordererhexibank_update.pb --type common.ConfigUpdate > ordererhexibank_update.json
+#添加交易头
+echo '{"payload":{"header":{"channel_header":{"channel_id":"testchannel", "type":2}},"data":{"config_update":'$(cat hexibank_update.json)'}}}' | jq . > hexibank_update_envelope.json
+#转为更新区块格式
+../bin/configtxlator proto_encode --input hexibank_update_envelope.json --type common.Envelope > hexibank_update_envelope.pb
+```
+最后，已有联盟内的两个组织管理员需要执行更新操作，依然是一方签名，然后有另一方更新：
+```shell
+docker exec -it cli-sdb-peer0 bash
+peer channel signconfigtx -f channel-artifacts/hexibank_update_envelope.pb
+exit
+
+docker exec -it cli-bjb-peer0 bash 
+#hexibank_update_envelope.pb应该是上个组织签名后的文件
+peer channel update -f channel-artifacts/hexibank_update_envelope.pb -c testchannel -o orderer0.beijingbank:8080 --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/beijingbank/orderers/orderer0.beijingbank/msp/tlscacerts/tlsca.beijingbank-cert.pem
+exit
+```
+至此，应用通道testchannel已经允许使用HexiBankMSP的peer节点加入了。新组织管理员只需要拉取0号区块并加入通道即可。
+
